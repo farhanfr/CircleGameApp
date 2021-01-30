@@ -16,8 +16,13 @@ const PostServices = () =>{
 }
 
 const CommentServices = ()=>{
+    const createComment = async(idUser,idPost,comment) => await axios.post(`${BASE_URL}/comment/add`,{
+        id_user:idUser,
+        id_post:idPost,
+        comment:comment
+    })
     const getAllByIdPost= async(id) => await axios.get(`${BASE_URL}/comment/get/all/${id}`)
-    return{getAllByIdPost}
+    return{createComment,getAllByIdPost}
 }
 
 export{UserServices,PostServices,CommentServices}

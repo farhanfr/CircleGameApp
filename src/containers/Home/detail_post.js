@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import { ActivityIndicator, Image, Text, View } from 'react-native'
+import { ActivityIndicator, Image, Text, ToastAndroid, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler';
 
 import ReadMore from '@fawazahmed/react-native-read-more';
 import {DetailPostComponent,AddCommentComponent} from '../../components/Home'
 import {PostServices,CommentServices} from '../../api/services'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 class DetailPost extends Component {
@@ -16,9 +17,24 @@ class DetailPost extends Component {
             dataComment:[],
             userPost:"",
             postId:"",
+            userId:"",
             isLoadingDetailPost:true,
             isLoadingCommentPost:true
         }
+    }
+
+    createComment = async(comment)=>{
+        const{createComment}=CommentServices()
+        const result = await createComment(this.state.userId,this.state.postId,comment)
+        .then(res=>{
+            console.log(res.data)
+            if (res.data.status == true) {
+                ToastAndroid.show('add comment success',ToastAndroid.LONG)
+                this.getAllCommentByIdPost(this.state.postId)
+            }else{
+                ToastAndroid.show(`add comment failed`,ToastAndroid.SHORT)
+            }
+        })
     }
 
     getAllPostById = async(postId)=>{
@@ -48,6 +64,10 @@ class DetailPost extends Component {
         const{postId}=this.props.route.params
         this.getAllPostById(postId)
         this.getAllCommentByIdPost(postId)
+        this.setState({postId:postId})
+        AsyncStorage.getItem('id_user').then((value)=>{
+            this.setState({userId:value})
+        })
         // const{getAllById}=PostServices()
         // const result = await getAllById()
     }
@@ -60,7 +80,7 @@ class DetailPost extends Component {
                 <ScrollView contentContainerStyle={{flexGrow:1}}>
                     <DetailPostComponent dataDetailPost={this.state.detailPost} dataUserPost={this.state.userPost} dataComment={this.state.dataComment}/>
                 </ScrollView>
-                <AddCommentComponent/>
+                <AddCommentComponent createComment={this.createComment}/>
             </View>
             
         )

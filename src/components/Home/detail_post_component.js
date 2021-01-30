@@ -52,6 +52,7 @@ class DetailPostComponent extends Component {
                             </View>
                         )
                     })}
+                    <View style={{paddingVertical:20}}></View>
                 </View>
             </View>
 
